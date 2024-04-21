@@ -10,16 +10,19 @@ CREATE TABLE D$Role(
 
 CREATE TABLE D$User(
     id serial PRIMARY KEY,
-    role_id INTEGER NOT NULL,
+    role_id INTEGER NOT NULL DEFAULT 2,
     username VARCHAR(20) UNIQUE NOT NULL,
     hashed_password VARCHAR(256) NOT NULL,
-    is_active BOOLEAN NOT NULL DEFAULT FALSE,
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
     FOREIGN KEY (role_id) REFERENCES D$Role(id)
 );
 
 
 INSERT INTO D$Role (name)
 VALUES ('admin');
+
+INSERT INTO D$Role (name)
+VALUES ('user');
 
 INSERT INTO D$User (role_id, username, hashed_password, is_active)
 VALUES (1, 'admin', '$2b$12$HLCCulVfOWd04.OptDk6zuCEdV4giC/WQGIMNNKVm7TjEDc5uuq5S', true);

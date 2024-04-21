@@ -58,7 +58,7 @@ async def verify_token(token: str, request: Request) -> TokenData:
         raise invalid_token_exception
 
 
-async def verify_access_token(token: str, request: Request) -> User or bool:
+async def verify_access_token(token: str, request: Request) -> User | bool:
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         id_u: str = payload.get("id")

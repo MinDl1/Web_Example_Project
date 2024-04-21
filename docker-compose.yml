@@ -1,10 +1,6 @@
 # docker-compose.yml
 
-version: '3.8'
-
-volumes:
-  postgres_data:
-  mongo_data:
+version: "3.8"
 
 services:
   api:
@@ -21,26 +17,151 @@ services:
       - REFRESH_TOKEN_EXPIRE_DAYS=${REFRESH_TOKEN_EXPIRE_DAYS}
     ports:
       - "8001:8001"
+    volumes:
+      - backend_api:/api
+    networks:
+      - api-postgres
+      - api-mongo
+      - cadvisor-api
     depends_on:
       mongo_database:
-        condition: service_started
+        condition: service_healthy
       postgres_database:
-        condition: service_started
+        condition: service_healthy
   postgres_database:
-    container_name: backend_database
+    container_name: backend_database_postgres
     build:
       context: .
       dockerfile: docker/backend/database/Dockerfile
-    volumes:
-      - postgres_data:/var/lib/postgresql/data/
     environment:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=${POSTGRES_DB}
+    ports:
+      - "5432:5432"
+    volumes:
+      - backend_database_postgres:/var/lib/postgresql/data/
+    networks:
+      - api-postgres
+      - cadvisor-postgres
   mongo_database:
+    container_name: backend_database_mongo
     image: mongodb/mongodb-community-server:6.0-ubi8
     environment:
       - MONGO_INITDB_ROOT_USERNAME=${MONGO_USER}
       - MONGO_INITDB_ROOT_PASSWORD=${MONGO_PASSWD}
+    ports:
+      - "27017:27017"
     volumes:
-      - mongo_data:/data/db
+      - backend_database_mongo_data:/data/db
+      - backend_database_mongo_config:/data/configdb
+    networks:
+      - api-mongo
+      - cadvisor-mongo
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:v0.49.1
+    container_name: cadvisor
+    privileged: true
+    restart: unless-stopped
+    devices:
+      - /dev/kmsg:/dev/kmsg
+    ports:
+      - "8002:8080"
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker:/var/lib/docker:ro
+      - /dev/disk/:/dev/disk:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - prometheus-cadvisor
+  nodeexporter:
+    image: prom/node-exporter
+    container_name: nodeexporter
+    restart: unless-stopped
+    command:
+      - "--path.procfs=/host/proc"
+      - "--path.rootfs=/rootfs"
+      - "--path.sysfs=/host/sys"
+      - "--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)"
+    ports:
+      - "8003:9100"
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    networks:
+      - prometheus-nodeexporter
+      - cadvisor-nodeexporter
+  prometheus:
+    image: prom/prometheus:v2.46.0
+    container_name: prometheus
+    restart: unless-stopped
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--web.console.libraries=/etc/prometheus/console_libraries"
+      - "--web.console.templates=/etc/prometheus/consoles"
+      - "--storage.tsdb.retention.time=200h"
+      - "--web.enable-lifecycle"
+    ports:
+      - "8004:9090"
+    volumes:
+      - ./monitoring/prometheus:/etc/prometheus
+      - prometheus_data:/prometheus
+    networks:
+      - grafana-prometheus
+      - prometheus-cadvisor
+      - prometheus-nodeexporter
+  grafana:
+    image: grafana/grafana:8.3.4
+    container_name: grafana
+    restart: unless-stopped
+    environment:
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_USER}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWD}
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_SERVER_HTTP_PORT=3000
+      - GF_SERVER_PROTOCOL=http
+    ports:
+      - "8005:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
+      - ./monitoring/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
+    networks:
+      - grafana-prometheus
+      - cadvisor-grafana
+
+volumes:
+  backend_api:
+  backend_database_postgres:
+  backend_database_mongo_data:
+  backend_database_mongo_config:
+  prometheus_data: {}
+  grafana_data: {}
+
+networks:
+  api-postgres:
+    driver: bridge
+  api-mongo:
+    driver: bridge
+  monitor-net:
+    driver: bridge
+  grafana-prometheus:
+    driver: bridge
+  prometheus-cadvisor:
+    driver: bridge
+  prometheus-nodeexporter:
+    driver: bridge
+  cadvisor-api:
+    driver: bridge
+  cadvisor-postgres:
+    driver: bridge
+  cadvisor-mongo:
+    driver: bridge
+  cadvisor-nodeexporter:
+    driver: bridge
+  cadvisor-grafana:
+    driver: bridge

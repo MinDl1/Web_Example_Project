@@ -31,7 +31,7 @@ async def read_users_me(
 
 
 @router.patch("/me", response_model=UserRead)
-async def update_user(
+async def update_user_me(
     current_user: Annotated[User, Depends(get_current_active_user)],
     request: Request,
     user_update: UserUpdate = Body(...)
@@ -55,7 +55,7 @@ async def update_user(
 
 
 @router.delete("/me", response_model=UserRead)
-async def update_user(
+async def delete_user_me(
     current_user: Annotated[User, Depends(get_current_active_user)],
     request: Request
 ):
@@ -78,7 +78,7 @@ async def update_user(
 
 
 @router.get("/all", response_model=List[UserReadMe])
-async def read_users(
+async def read_users_all(
     current_user: Annotated[User, Depends(get_current_active_admin_user)],
     request: Request
 ):
@@ -97,7 +97,7 @@ async def read_users(
 
 
 @router.get("/{id_u}", response_model=UserReadMe)
-async def read_users(
+async def read_user_by_id(
     id_u: int,
     current_user: Annotated[User, Depends(get_current_active_admin_user)],
     request: Request
@@ -117,7 +117,7 @@ async def read_users(
 
 
 @router.patch("/{id_u}", response_model=UserRead)
-async def update_user(
+async def update_user_by_id(
     id_u: int,
     current_user: Annotated[User, Depends(get_current_active_admin_user)],
     request: Request,
@@ -142,7 +142,7 @@ async def update_user(
 
 
 @router.delete("/{id_u}", response_model=UserRead)
-async def update_user(
+async def delete_user_by_id(
     id_u: int,
     current_user: Annotated[User, Depends(get_current_active_admin_user)],
     request: Request
