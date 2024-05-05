@@ -2,7 +2,6 @@
 
 # Will be done
 
-- [ ] Error codes
 - [ ] Unit auto tests
 - [ ] CI/CD (Jenkins)
 - [ ] Documentation
@@ -12,6 +11,7 @@
 
 ---
 
+- [x] Error codes
 - [x] Monitoring (Grafana, Prometheus, Cadvisor, Node exporter)
 
 # How to start
@@ -26,7 +26,7 @@ cp example.env.txt .env
 
 ### Default admin user in PostgreSQL for application:
 
-Login: admin
+Login: admin  
 Password: 12345
 
 ## BUILD and RUN docker-compose

@@ -1,9 +1,9 @@
 from fastapi import status
 
-from routes.auth.errors import ErrorModel, ErrorCode
+from routes.auth.errors import ErrorCode, ErrorModel
 
 
-postgres_post_responses = {
+create_role_post_responses = {
     status.HTTP_400_BAD_REQUEST: {
         "model": ErrorModel,
         "content": {
@@ -23,7 +23,7 @@ postgres_post_responses = {
                         "value": {
                             "detail": {
                                 "code": ErrorCode.ID_NOT_FOUND,
-                                "reason": "Example1 with test ... not found"
+                                "reason": "Role with name ... not found"
                             }
                         },
                     },
@@ -81,13 +81,22 @@ postgres_post_responses = {
                             }
                         },
                     },
+                    ErrorCode.NOT_ADMIN_USER: {
+                        "summary": "NOT_ADMIN_USER",
+                        "value": {
+                            "detail": {
+                                "code": ErrorCode.NOT_ADMIN_USER,
+                                "reason": "NOT_ADMIN_USER"
+                            }
+                        },
+                    },
                 }
             }
         },
     }
 }
 
-postgres_get_responses = {
+all_role_get_responses = {
     status.HTTP_401_UNAUTHORIZED: {
         "model": ErrorModel,
         "content": {
@@ -138,13 +147,22 @@ postgres_get_responses = {
                             }
                         },
                     },
+                    ErrorCode.NOT_ADMIN_USER: {
+                        "summary": "NOT_ADMIN_USER",
+                        "value": {
+                            "detail": {
+                                "code": ErrorCode.NOT_ADMIN_USER,
+                                "reason": "NOT_ADMIN_USER"
+                            }
+                        },
+                    },
                 }
             }
         },
     }
 }
 
-postgres_get_one_delete_responses = {
+role_get_responses = {
     status.HTTP_400_BAD_REQUEST: {
         "model": ErrorModel,
         "content": {
@@ -155,7 +173,7 @@ postgres_get_one_delete_responses = {
                         "value": {
                             "detail": {
                                 "code": ErrorCode.ID_NOT_FOUND,
-                                "reason": "Example1 with ID id_p not found"
+                                "reason": "Role with id id_r not found"
                             }
                         },
                     },
@@ -213,13 +231,22 @@ postgres_get_one_delete_responses = {
                             }
                         },
                     },
+                    ErrorCode.NOT_ADMIN_USER: {
+                        "summary": "NOT_ADMIN_USER",
+                        "value": {
+                            "detail": {
+                                "code": ErrorCode.NOT_ADMIN_USER,
+                                "reason": "NOT_ADMIN_USER"
+                            }
+                        },
+                    },
                 }
             }
         },
     }
 }
 
-postgres_patch_responses = {
+role_patch_responses = {
     status.HTTP_400_BAD_REQUEST: {
         "model": ErrorModel,
         "content": {
@@ -230,7 +257,7 @@ postgres_patch_responses = {
                         "value": {
                             "detail": {
                                 "code": ErrorCode.ID_NOT_FOUND,
-                                "reason": "Example1 with ID id_p not found"
+                                "reason": "Role with id id_r not found"
                             }
                         },
                     },
@@ -303,6 +330,99 @@ postgres_patch_responses = {
                             "detail": {
                                 "code": ErrorCode.LOGIN_USER_IS_NOT_ACTIVE,
                                 "reason": "LOGIN_USER_IS_NOT_ACTIVE"
+                            }
+                        },
+                    },
+                    ErrorCode.NOT_ADMIN_USER: {
+                        "summary": "NOT_ADMIN_USER",
+                        "value": {
+                            "detail": {
+                                "code": ErrorCode.NOT_ADMIN_USER,
+                                "reason": "NOT_ADMIN_USER"
+                            }
+                        },
+                    },
+                }
+            }
+        },
+    }
+}
+
+role_delete_responses = {
+    status.HTTP_400_BAD_REQUEST: {
+        "model": ErrorModel,
+        "content": {
+            "application/json": {
+                "examples": {
+                    ErrorCode.ID_NOT_FOUND: {
+                        "summary": "ID_NOT_FOUND",
+                        "value": {
+                            "detail": {
+                                "code": ErrorCode.ID_NOT_FOUND,
+                                "reason": "Role with id id_r not found"
+                            }
+                        },
+                    },
+                }
+            }
+        },
+    },
+    status.HTTP_401_UNAUTHORIZED: {
+        "model": ErrorModel,
+        "content": {
+            "application/json": {
+                "examples": {
+                    ErrorCode.INVALID_TOKEN: {
+                        "summary": "INVALID_TOKEN",
+                        "value": {
+                            "detail": {
+                                "code": ErrorCode.INVALID_TOKEN,
+                                "reason": "INVALID_TOKEN"
+                            }
+                        },
+                    },
+                    ErrorCode.BAD_CREDENTIALS: {
+                        "summary": "BAD_CREDENTIALS",
+                        "value": {
+                            "detail": {
+                                "code": ErrorCode.BAD_CREDENTIALS,
+                                "reason": "Could not validate credentials"
+                            }
+                        },
+                    },
+                }
+            }
+        },
+    },
+    status.HTTP_403_FORBIDDEN: {
+        "model": ErrorModel,
+        "content": {
+            "application/json": {
+                "examples": {
+                    ErrorCode.BAD_CREDENTIALS: {
+                        "summary": "BAD_CREDENTIALS",
+                        "value": {
+                            "detail": {
+                                "code": ErrorCode.BAD_CREDENTIALS,
+                                "reason": "Access token expires but refresh exists"
+                            }
+                        },
+                    },
+                    ErrorCode.LOGIN_USER_IS_NOT_ACTIVE: {
+                        "summary": "LOGIN_USER_IS_NOT_ACTIVE",
+                        "value": {
+                            "detail": {
+                                "code": ErrorCode.LOGIN_USER_IS_NOT_ACTIVE,
+                                "reason": "LOGIN_USER_IS_NOT_ACTIVE"
+                            }
+                        },
+                    },
+                    ErrorCode.NOT_ADMIN_USER: {
+                        "summary": "NOT_ADMIN_USER",
+                        "value": {
+                            "detail": {
+                                "code": ErrorCode.NOT_ADMIN_USER,
+                                "reason": "NOT_ADMIN_USER"
                             }
                         },
                     },

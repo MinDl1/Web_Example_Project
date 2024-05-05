@@ -19,3 +19,4 @@ class ErrorCode(str, Enum):
     """
     ID_NOT_FOUND = "ID_NOT_FOUND"
     ID_EXISTS_ERROR = "ID_EXISTS_ERROR"
+    DATA_NOT_MODIFIED = "DATA_NOT_MODIFIED"

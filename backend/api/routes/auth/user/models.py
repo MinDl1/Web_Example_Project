@@ -1,3 +1,4 @@
+from asyncpg import Record
 from pydantic import BaseModel
 from typing import Optional
 
@@ -9,29 +10,19 @@ class User(BaseModel):
     hashed_password: str
     is_active: bool
 
-    @classmethod
-    def from_dict(cls, user_dict):
-        return cls(**user_dict)
-
 
 class UserRead(BaseModel):
+    id: int
     role_id: int
+    role_name: str
     username: str
     is_active: bool
-
-    @classmethod
-    def from_dict(cls, user_dict):
-        return cls(**user_dict)
 
 
 class UserReadMe(BaseModel):
     role_name: str
     username: str
     is_active: bool
-
-    @classmethod
-    def from_dict(cls, user_dict):
-        return cls(**user_dict)
 
 
 class UserCreate(BaseModel):

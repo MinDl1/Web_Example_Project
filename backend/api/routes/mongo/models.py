@@ -24,9 +24,9 @@ class Book(BaseModel):
 
 
 class BookUpdate(BaseModel):
-    title: Optional[str]
-    author: Optional[str]
-    synopsis: Optional[str]
+    title: Optional[str] = None
+    author: Optional[str] = None
+    synopsis: Optional[str] = None
 
     model_config = {
         "json_schema_extra": {

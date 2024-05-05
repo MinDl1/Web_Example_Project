@@ -1,16 +1,16 @@
+from typing import Any
+
+from routes.auth.ident.models import TokenData
+from routes.auth.user.models import UserCreate
 from routes.auth.utils.sql_utils import insert_record
-from routes.auth.ident.utils import pwd_context
 
 
-def get_password_hash(password):
-    return pwd_context.hash(password)
-
-
-def create_user_query(user_create):
+def create_user_query(user_create: UserCreate, current_user: TokenData) -> tuple[str, Any]:
     user_create_dict = dict(user_create)
-    hashed_password = get_password_hash(user_create_dict["password"])
-    user_create_dict.pop("password")
-    user_create_dict.update({"hashed_password": hashed_password})
+
+    if not current_user:
+        user_create_dict.update({"role_id": 2})
+        user_create_dict.update({"is_active": True})
 
     sql_query, *values = insert_record(user_create_dict, "D$User")
 

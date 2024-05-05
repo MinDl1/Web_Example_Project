@@ -1,7 +1,5 @@
 # docker-compose.yml
 
-version: "3.8"
-
 services:
   api:
     container_name: backend_api
@@ -22,28 +20,28 @@ services:
     networks:
       - api-postgres
       - api-mongo
-      - cadvisor-api
     depends_on:
       mongo_database:
-        condition: service_healthy
+        condition: service_started
       postgres_database:
-        condition: service_healthy
+        condition: service_started
   postgres_database:
     container_name: backend_database_postgres
     build:
       context: .
-      dockerfile: docker/backend/database/Dockerfile
+      dockerfile: docker/backend/database/postgres/Dockerfile
     environment:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=${POSTGRES_DB}
+      - TEST_POSTGRES_DB=${TEST_POSTGRES_DB}
     ports:
       - "5432:5432"
     volumes:
       - backend_database_postgres:/var/lib/postgresql/data/
     networks:
       - api-postgres
-      - cadvisor-postgres
+      - test_api-postgres
   mongo_database:
     container_name: backend_database_mongo
     image: mongodb/mongodb-community-server:6.0-ubi8
@@ -57,10 +55,10 @@ services:
       - backend_database_mongo_config:/data/configdb
     networks:
       - api-mongo
-      - cadvisor-mongo
+      - test_api-mongo
   cadvisor:
-    image: gcr.io/cadvisor/cadvisor:v0.49.1
     container_name: cadvisor
+    image: gcr.io/cadvisor/cadvisor:v0.49.1
     privileged: true
     restart: unless-stopped
     devices:
@@ -77,8 +75,8 @@ services:
     networks:
       - prometheus-cadvisor
   nodeexporter:
-    image: prom/node-exporter
     container_name: nodeexporter
+    image: prom/node-exporter
     restart: unless-stopped
     command:
       - "--path.procfs=/host/proc"
@@ -93,10 +91,9 @@ services:
       - /:/rootfs:ro
     networks:
       - prometheus-nodeexporter
-      - cadvisor-nodeexporter
   prometheus:
-    image: prom/prometheus:v2.46.0
     container_name: prometheus
+    image: prom/prometheus:v2.46.0
     restart: unless-stopped
     command:
       - "--config.file=/etc/prometheus/prometheus.yml"
@@ -115,8 +112,8 @@ services:
       - prometheus-cadvisor
       - prometheus-nodeexporter
   grafana:
-    image: grafana/grafana:8.3.4
     container_name: grafana
+    image: grafana/grafana:8.3.4
     restart: unless-stopped
     environment:
       - GF_SECURITY_ADMIN_USER=${GRAFANA_USER}
@@ -132,7 +129,22 @@ services:
       - ./monitoring/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
     networks:
       - grafana-prometheus
-      - cadvisor-grafana
+
+  test_api:
+    container_name: test_api
+    build:
+      context: .
+      dockerfile: docker/backend/test/api/Dockerfile
+    environment:
+      - POSTGRES_DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres_database:${POSTGRES_PORT}/${TEST_POSTGRES_DB}
+      - MONGO_DATABASE_URL=mongodb://${MONGO_USER}:${MONGO_PASSWD}@mongo_database
+      - MONGO_DATABASE_NAME=${TEST_MONGO_DATABASE_NAME}
+      - SECRET_KEY=${SECRET_KEY}
+      - ACCESS_TOKEN_EXPIRE_MINUTES=${ACCESS_TOKEN_EXPIRE_MINUTES}
+      - REFRESH_TOKEN_EXPIRE_DAYS=${REFRESH_TOKEN_EXPIRE_DAYS}
+    networks:
+      - test_api-postgres
+      - test_api-mongo
 
 volumes:
   backend_api:
@@ -147,21 +159,13 @@ networks:
     driver: bridge
   api-mongo:
     driver: bridge
-  monitor-net:
-    driver: bridge
   grafana-prometheus:
     driver: bridge
   prometheus-cadvisor:
     driver: bridge
   prometheus-nodeexporter:
     driver: bridge
-  cadvisor-api:
+  test_api-postgres:
     driver: bridge
-  cadvisor-postgres:
-    driver: bridge
-  cadvisor-mongo:
-    driver: bridge
-  cadvisor-nodeexporter:
-    driver: bridge
-  cadvisor-grafana:
+  test_api-mongo:
     driver: bridge
