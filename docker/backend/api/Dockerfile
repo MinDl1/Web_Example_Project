@@ -7,7 +7,7 @@ ENV PYTHONUNBUFFERED 1
 # create dir and assign the folder as the main
 WORKDIR /api
 
-# copy project, config, env
+# copy project
 COPY ./backend/api .
 
 # copy and install requirments

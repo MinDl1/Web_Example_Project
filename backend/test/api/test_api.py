@@ -1,6 +1,6 @@
 from fastapi.testclient import TestClient
 
-from test_config import TEST_USER, TEST_PASSWD
+from test_config import TEST_USER, TEST_PASSWORD
 from main import app
 
 
@@ -27,7 +27,7 @@ def test_login():
             "/auth/token",
             data={
                 "username": TEST_USER,
-                "password": TEST_PASSWD
+                "password": TEST_PASSWORD
             },
         )
         assert response.status_code == 200

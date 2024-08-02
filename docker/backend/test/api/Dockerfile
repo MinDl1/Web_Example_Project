@@ -7,11 +7,12 @@ ENV PYTHONUNBUFFERED 1
 # create dir and assign the folder as the main
 WORKDIR /test
 
-# copy project, config, env
+# copy project and test
 COPY ./backend/api ./
 COPY ./backend/test/api ./test
 
-# copy and install requirments
+# install requirments
+RUN pip install -r requirements.txt
 RUN pip install -r test/requirements.txt
 
 CMD ["python","-m","pytest", "test/"]
