@@ -86,7 +86,7 @@ services:
       - prometheus-cadvisor
   nodeexporter:
     container_name: nodeexporter
-    image: prom/node-exporter
+    image: prom/node-exporter:v1.8.2
     restart: unless-stopped
     command:
       - "--path.procfs=/host/proc"
@@ -141,7 +141,7 @@ services:
       - grafana-prometheus
 
   test_api:
-    container_name: test_api
+    container_name: test_backend_api
     build:
       context: .
       dockerfile: docker/backend/test/api/Dockerfile
