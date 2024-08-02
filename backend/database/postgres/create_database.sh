@@ -1,5 +1,0 @@
-#!/bin/bash
-
-psql -U ${POSTGRES_USER} <<-END
-    CREATE DATABASE ${TEST_POSTGRES_DB};
-END

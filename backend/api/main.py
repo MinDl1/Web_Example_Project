@@ -16,11 +16,11 @@ from routes.auth.role.routes import router as role_router
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI):
-    app.mongodb_client = motor.AsyncIOMotorClient(MONGO_DATABASE_URL)
-    app.database = app.mongodb_client[MONGO_DATABASE_NAME]
+async def lifespan(api: FastAPI):
+    api.mongodb_client = motor.AsyncIOMotorClient(MONGO_DATABASE_URL)
+    api.database = api.mongodb_client[MONGO_DATABASE_NAME]
 
-    app.postgresql = await asyncpg.connect(POSTGRES_DATABASE_URL)
+    api.postgresql = await asyncpg.connect(POSTGRES_DATABASE_URL)
     yield
 
 

@@ -2,7 +2,7 @@
 
 # Will be done
 
-- [ ] Unit auto tests
+- [ ] Automatic deployment
 - [ ] CI/CD (Jenkins)
 - [ ] Documentation
 - [ ] Frontend on React
@@ -11,6 +11,7 @@
 
 ---
 
+- [x] Unit auto tests
 - [x] Error codes
 - [x] Monitoring (Grafana, Prometheus, Cadvisor, Node exporter)
 

@@ -3,6 +3,7 @@ import pytest
 import pytest_asyncio
 from asgi_lifespan import LifespanManager
 
+from test_config import TEST_USER, TEST_PASSWD
 from main import app
 
 
@@ -22,10 +23,12 @@ async def client(life_app):
 async def test_post_mongo(client):
     response = await client.post(
             "/mongo/",
-            json={"_id": "test",
+            json={
+                "_id": "test",
                 "title": "test",
                 "author": "test",
-                "synopsis": "test"},
+                "synopsis": "test"
+            },
         )
     assert response.status_code == 201
     assert response.json() == {
@@ -40,10 +43,12 @@ async def test_post_mongo(client):
 async def test_post_mongo_ID_EXISTS_ERROR(client):
     response = await client.post(
             "/mongo/",
-            json={"_id": "test",
+            json={
+                "_id": "test",
                 "title": "test",
                 "author": "test",
-                "synopsis": "test"},
+                "synopsis": "test"
+            },
         )
     assert response.status_code == 400
 
@@ -82,9 +87,11 @@ async def test_get_mongo_one_ID_NOT_FOUND(client):
 async def test_patch_mongo(client):
     response = await client.patch(
             "/mongo/test",
-            json={"title": "test1",
+            json={
+                "title": "test1",
                 "author": "test1",
-                "synopsis": "test1"},
+                "synopsis": "test1"
+            },
         )
     assert response.status_code == 200
     assert response.json() == {
@@ -99,9 +106,11 @@ async def test_patch_mongo(client):
 async def test_patch_mongo_DATA_NOT_MODIFIED(client):
     response = await client.patch(
             "/mongo/test",
-            json={"title": "test1",
+            json={
+                "title": "test1",
                 "author": "test1",
-                "synopsis": "test1"},
+                "synopsis": "test1"
+            },
         )
     assert response.status_code == 400
 
@@ -110,9 +119,11 @@ async def test_patch_mongo_DATA_NOT_MODIFIED(client):
 async def test_patch_mongo_ID_NOT_FOUND(client):
     response = await client.patch(
             "/mongo/test1",
-            json={"title": "test",
+            json={
+                "title": "test",
                 "author": "test",
-                "synopsis": "test"},
+                "synopsis": "test"
+            },
         )
     assert response.status_code == 400
 
@@ -127,3 +138,36 @@ async def test_delete_mongo(client):
 async def test_delete_mongo_ID_NOT_FOUND(client):
     response = await client.delete("/mongo/test")
     assert response.status_code == 400
+
+
+@pytest.mark.asyncio
+async def test_login(client):
+    response = await client.post(
+            "/auth/token",
+            data={
+                "username": TEST_USER,
+                "password": TEST_PASSWD
+            },
+        )
+    assert response.status_code == 200
+
+    refresh_token = response.cookies
+    access_token = response.json()["access_token"]
+
+    assert access_token is not None
+    return access_token, refresh_token
+
+
+@pytest.mark.asyncio
+async def test_get_postgres(client):
+    access_token, refresh_token = await test_login(client)
+
+    response = await client.get(
+            "/postgres/",
+            headers={
+                "Authorization": f'Bearer {access_token}'
+            },
+            cookies=refresh_token
+        )
+    assert response.status_code == 200
+    assert response.json() == []

@@ -7,7 +7,7 @@ services:
       context: .
       dockerfile: docker/backend/api/Dockerfile
     environment:
-      - POSTGRES_DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres_database:${POSTGRES_PORT}/${POSTGRES_DB}
+      - POSTGRES_DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres_database:5432/${POSTGRES_DB}
       - MONGO_DATABASE_URL=mongodb://${MONGO_USER}:${MONGO_PASSWD}@mongo_database
       - MONGO_DATABASE_NAME=${MONGO_DATABASE_NAME}
       - SECRET_KEY=${SECRET_KEY}
@@ -25,6 +25,8 @@ services:
         condition: service_started
       postgres_database:
         condition: service_started
+      test_api:
+        condition: service_completed_successfully
   postgres_database:
     container_name: backend_database_postgres
     build:
@@ -34,6 +36,8 @@ services:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=${POSTGRES_DB}
+      - TEST_POSTGRES_USER=${TEST_POSTGRES_USER}
+      - TEST_POSTGRES_PASSWORD=${TEST_POSTGRES_PASSWORD}
       - TEST_POSTGRES_DB=${TEST_POSTGRES_DB}
     ports:
       - "5432:5432"
@@ -44,10 +48,16 @@ services:
       - test_api-postgres
   mongo_database:
     container_name: backend_database_mongo
-    image: mongodb/mongodb-community-server:6.0-ubi8
+    build:
+      context: .
+      dockerfile: docker/backend/database/mongodb/Dockerfile
     environment:
       - MONGO_INITDB_ROOT_USERNAME=${MONGO_USER}
       - MONGO_INITDB_ROOT_PASSWORD=${MONGO_PASSWD}
+      - MONGO_INITDB_DATABASE=${MONGO_DATABASE_NAME}
+      - TEST_MONGO_USER=${TEST_MONGO_USER}
+      - TEST_MONGO_PASSWD=${TEST_MONGO_PASSWD}
+      - TEST_MONGO_DATABASE_NAME=${TEST_MONGO_DATABASE_NAME}
     ports:
       - "27017:27017"
     volumes:
@@ -136,15 +146,24 @@ services:
       context: .
       dockerfile: docker/backend/test/api/Dockerfile
     environment:
-      - POSTGRES_DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres_database:${POSTGRES_PORT}/${TEST_POSTGRES_DB}
-      - MONGO_DATABASE_URL=mongodb://${MONGO_USER}:${MONGO_PASSWD}@mongo_database
+      - POSTGRES_DATABASE_URL=postgresql://${TEST_POSTGRES_USER}:${TEST_POSTGRES_PASSWORD}@postgres_database:5432/${TEST_POSTGRES_DB}
+      - MONGO_DATABASE_URL=mongodb://${TEST_MONGO_USER}:${TEST_MONGO_PASSWD}@mongo_database
       - MONGO_DATABASE_NAME=${TEST_MONGO_DATABASE_NAME}
-      - SECRET_KEY=${SECRET_KEY}
+      - SECRET_KEY=${TEST_SECRET_KEY}
       - ACCESS_TOKEN_EXPIRE_MINUTES=${ACCESS_TOKEN_EXPIRE_MINUTES}
       - REFRESH_TOKEN_EXPIRE_DAYS=${REFRESH_TOKEN_EXPIRE_DAYS}
+      - TEST_USER=${TEST_USER}
+      - TEST_PASSWD=${TEST_PASSWD}
     networks:
       - test_api-postgres
       - test_api-mongo
+    volumes:
+      - test_backend_api:/test
+    depends_on:
+      mongo_database:
+        condition: service_started
+      postgres_database:
+        condition: service_started
 
 volumes:
   backend_api:
@@ -153,6 +172,7 @@ volumes:
   backend_database_mongo_config:
   prometheus_data: {}
   grafana_data: {}
+  test_backend_api:
 
 networks:
   api-postgres:

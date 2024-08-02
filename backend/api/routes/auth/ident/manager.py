@@ -22,7 +22,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/token", auto_error=False)
 async def get_current_user(
     access_token: Annotated[str, Depends(oauth2_scheme)],
     request: Request,
-    #refresh_token: Annotated[str | None, Cookie()] = None
+    # refresh_token: Annotated[str | None, Cookie()] = None
 ) -> User:
     refresh_token = request.cookies.get('refresh_token')
     credentials_exception = HTTPException(
@@ -83,7 +83,7 @@ async def get_current_active_admin_user(
 async def get_current_active_admin_user_or_false(
     access_token: Annotated[str, Depends(oauth2_scheme)],
     request: Request,
-    #refresh_token: Annotated[str | None, Cookie()] = None
+    # refresh_token: Annotated[str | None, Cookie()] = None
 ) -> User | Literal[False]:
     refresh_token = request.cookies.get('refresh_token')
     user = False
