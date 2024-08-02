@@ -2,7 +2,6 @@
 
 # Will be done
 
-- [ ] Automatic deployment
 - [ ] CI/CD (Jenkins)
 - [ ] Documentation
 - [ ] Frontend on React
@@ -11,6 +10,7 @@
 
 ---
 
+- [x] Automatic deployment
 - [x] Unit auto tests
 - [x] Error codes
 - [x] Monitoring (Grafana, Prometheus, Cadvisor, Node exporter)
