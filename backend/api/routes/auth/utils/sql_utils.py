@@ -1,12 +1,13 @@
 import datetime
 from typing import Optional
 from typing_extensions import Any
-from pydantic import BaseModel
 
+from pydantic import BaseModel
 from fastapi import HTTPException, status
 
 from routes.auth.utils.passwd_hash import get_password_hash
 from routes.auth.errors import ErrorCode
+from .email_valid import email_valid
 
 
 def python_type_to_sql_type(python_type: Any) -> str:
@@ -25,6 +26,47 @@ def python_type_to_sql_type(python_type: Any) -> str:
     return ''
 
 
+def insert_record(
+    model: BaseModel | dict,
+    table_name: str
+) -> tuple[str, Any]:
+    if type(model) is not dict:
+        model = model.model_dump(exclude_none=True)
+
+    if 'password' in model:
+        hashed_password = get_password_hash(model["password"])
+        model.pop("password")
+        model.update({"hashed_password": hashed_password})
+
+    if 'email' in model:
+        if_email = email_valid(model["email"])
+
+        if not if_email:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail={
+                    "code": ErrorCode.BAD_EMAIL,
+                    "reason": "Not an email entered"
+                },
+            )
+
+    insert_fields = []
+    set_clauses = []
+    values = []
+
+    for field, value in model.items():
+        insert_fields.append(field)
+        python_type = type(value)
+        data_type = python_type_to_sql_type(python_type)
+        set_clauses.append(f"${len(values) + 1}{data_type}")
+        values.append(value)
+
+    sql_query = (f"INSERT INTO {table_name} (" + ", ".join(insert_fields) +
+        ") VALUES (" + ", ".join(set_clauses) + ") RETURNING *")
+
+    return sql_query, *values
+
+
 def update_record(
     model: BaseModel | dict,
     table_name: str,
@@ -32,12 +74,24 @@ def update_record(
     id_field_name: str = "id"
 ) -> tuple[str, Any]:
     if type(model) is not dict:
-        model = model.dict(exclude_none=True)
+        model = model.model_dump(exclude_none=True)
 
     if 'password' in model:
         hashed_password = get_password_hash(model["password"])
         model.pop("password")
         model.update({"hashed_password": hashed_password})
+
+    if 'email' in model:
+        if_email = email_valid(model["email"])
+
+        if not if_email:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail={
+                    "code": ErrorCode.BAD_EMAIL,
+                    "reason": "Not an email entered"
+                },
+            )
 
     set_clauses = []
     values = []
@@ -62,35 +116,6 @@ def update_record(
         f"{python_type_to_sql_type(type(record_id))} "
         f"RETURNING *")
     values.append(record_id)
-    return sql_query, *values
-
-
-def insert_record(
-    model: BaseModel | dict,
-    table_name: str
-) -> tuple[str, Any]:
-    if type(model) is not dict:
-        model = model.dict(exclude_none=True)
-
-    if 'password' in model:
-        hashed_password = get_password_hash(model["password"])
-        model.pop("password")
-        model.update({"hashed_password": hashed_password})
-
-    insert_fields = []
-    set_clauses = []
-    values = []
-
-    for field, value in model.items():
-        insert_fields.append(field)
-        python_type = type(value)
-        data_type = python_type_to_sql_type(python_type)
-        set_clauses.append(f"${len(values) + 1}{data_type}")
-        values.append(value)
-
-    sql_query = (f"INSERT INTO {table_name} (" + ", ".join(insert_fields) +
-        ") VALUES (" + ", ".join(set_clauses) + ") RETURNING *")
-
     return sql_query, *values
 
 

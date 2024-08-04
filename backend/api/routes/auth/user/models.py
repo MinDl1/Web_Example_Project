@@ -7,6 +7,7 @@ class User(BaseModel):
     id: int
     role_id: int
     username: str
+    email: str
     hashed_password: str
     is_active: bool
 
@@ -16,18 +17,21 @@ class UserRead(BaseModel):
     role_id: int
     role_name: str
     username: str
+    email: str
     is_active: bool
 
 
 class UserReadMe(BaseModel):
     role_name: str
     username: str
+    email: str
     is_active: bool
 
 
 class UserCreate(BaseModel):
     role_id: int
     username: str
+    email: str
     password: str
     is_active: bool
 
@@ -35,5 +39,6 @@ class UserCreate(BaseModel):
 class UserUpdate(BaseModel):
     role_id: Optional[int] = None
     username: Optional[str] = None
+    email: Optional[str] = None
     password: Optional[str] = None
     is_active: Optional[bool] = None

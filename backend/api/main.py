@@ -9,6 +9,10 @@ from config import (
     MONGO_DATABASE_NAME,
     POSTGRES_DATABASE_URL,
     REDIS_CACHE_URL,
+    SMTP_HOST,
+    SMTP_PORT,
+    SMTP_EMAIL,
+    SMTP_PASSWORD,
 )
 from routes.mongo.routes import router as mongo_router
 from routes.postgres.routes import router as postgres_router
@@ -17,6 +21,7 @@ from routes.auth.ident.manager import get_current_active_user
 from routes.auth.register.routes import router as register_router
 from routes.auth.res_forgot_passwd.routes import router as res_forgot_passwd
 from routes.auth.res_forgot_passwd.redis.redis import RedisTools
+from routes.auth.res_forgot_passwd.smtp.smtp import SmtpTools
 from routes.auth.user.routes import router as users_router
 from routes.auth.role.routes import router as role_router
 
@@ -29,10 +34,12 @@ async def lifespan(api: FastAPI):
     api.postgresql = await asyncpg.connect(POSTGRES_DATABASE_URL)
 
     api.redis = RedisTools(url=REDIS_CACHE_URL)
+
+    api.smtp = SmtpTools(SMTP_HOST, SMTP_PORT, SMTP_EMAIL, SMTP_PASSWORD)
     yield
 
 
-app = FastAPI(lifespan=lifespan)
+app = FastAPI(title="Web_Example_Project", version="0.5.2", lifespan=lifespan)
 
 
 app.include_router(auth_router, tags=["auth"], prefix="/auth")

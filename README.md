@@ -5,11 +5,11 @@
 - [ ] CI/CD (Jenkins)
 - [ ] Documentation
 - [ ] Frontend on React
-- [ ] Endpoints in res_forgot_passwd (with redis)
 - [ ] And other things
 
 ---
 
+- [x] Endpoints in res_forgot_passwd (with redis)
 - [x] Automatic deployment
 - [x] Unit auto tests
 - [x] Error codes
