@@ -7,7 +7,7 @@ from fastapi import (
     Request,
     HTTPException,
     status,
-    Cookie,
+    # Cookie,
 )
 from fastapi.security import OAuth2PasswordRequestForm
 
@@ -91,7 +91,6 @@ async def refresh_access_token(
     description="Logout from application",
     response_description="Deleted refresh token (Cookie)",
     status_code=status.HTTP_200_OK,
-    response_model=Token,
     responses=logout_post_responses,
 )
 async def logout_user(

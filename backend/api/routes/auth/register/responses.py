@@ -27,6 +27,15 @@ register_user_post_responses = {
                             }
                         },
                     },
+                    ErrorCode.BAD_EMAIL: {
+                        "summary": "BAD_EMAIL",
+                        "value": {
+                            "detail": {
+                                "code": ErrorCode.BAD_EMAIL,
+                                "reason": "Not an email entered"
+                            }
+                        },
+                    },
                 }
             }
         },

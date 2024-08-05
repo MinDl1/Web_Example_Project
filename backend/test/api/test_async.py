@@ -3,7 +3,7 @@ import pytest
 import pytest_asyncio
 from asgi_lifespan import LifespanManager
 
-from test_config import TEST_USER, TEST_PASSWD
+from test_config import TEST_USER, TEST_PASSWORD
 from main import app
 
 
@@ -146,7 +146,7 @@ async def test_login(client):
             "/auth/token",
             data={
                 "username": TEST_USER,
-                "password": TEST_PASSWD
+                "password": TEST_PASSWORD
             },
         )
     assert response.status_code == 200

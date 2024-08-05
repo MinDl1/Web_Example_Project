@@ -2,14 +2,17 @@
 
 # Will be done
 
+- [ ] SSL/TLS
+- [ ] Machine learning model
+- [ ] RabbitMQ
 - [ ] CI/CD (Jenkins)
 - [ ] Documentation
 - [ ] Frontend on React
-- [ ] Endpoints in res_forgot_passwd (with redis)
 - [ ] And other things
 
 ---
 
+- [x] Endpoints in res_forgot_passwd (with redis)
 - [x] Automatic deployment
 - [x] Unit auto tests
 - [x] Error codes
@@ -41,6 +44,7 @@ docker-compose up --build -d
 - [FastAPI](https://fastapi.tiangolo.com/) [Swagger](https://swagger.io/) - http://127.0.0.1:8001/docs
 - [PostgreSQL](https://www.postgresql.org/) - http://127.0.0.1:5432
 - [MongoDB](https://www.mongodb.com/) - http://127.0.0.1:27017
+- [Redis](https://redis.io/) - http://127.0.0.1:6379
 - [Cadvisor](https://github.com/google/cadvisor) - http://127.0.0.1:8002
 - [Node exporter](https://github.com/prometheus/node_exporter) - http://127.0.0.1:8003
 - [Prometheus](https://prometheus.io/) - http://127.0.0.1:8004

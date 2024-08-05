@@ -1,0 +1,11 @@
+bind 0.0.0.0
+
+databases 2
+
+# Set the password to access Redis
+requirepass {REDIS_PASSWORD}
+
+# Setting up an ACL (Access Control List) to create a new user
+user default on >{REDIS_PASSWORD} ~* +@all
+user {REDIS_USER} on >{REDIS_USER_PASSWORD} ~* +@all
+user {TEST_REDIS_USER} on >{TEST_REDIS_USER_PASSWORD} ~* +@all

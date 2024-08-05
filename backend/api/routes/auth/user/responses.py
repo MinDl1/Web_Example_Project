@@ -102,6 +102,15 @@ user_me_patch_responses = {
                             }
                         },
                     },
+                    ErrorCode.BAD_EMAIL: {
+                        "summary": "BAD_EMAIL",
+                        "value": {
+                            "detail": {
+                                "code": ErrorCode.BAD_EMAIL,
+                                "reason": "Not an email entered"
+                            }
+                        },
+                    },
                 }
             }
         },
@@ -417,6 +426,15 @@ user_patch_responses = {
                             "detail": {
                                 "code": ErrorCode.UNIQUE_ERROR,
                                 "reason": "Unique value error"
+                            }
+                        },
+                    },
+                    ErrorCode.BAD_EMAIL: {
+                        "summary": "BAD_EMAIL",
+                        "value": {
+                            "detail": {
+                                "code": ErrorCode.BAD_EMAIL,
+                                "reason": "Not an email entered"
                             }
                         },
                     },
