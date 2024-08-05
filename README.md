@@ -2,6 +2,7 @@
 
 # Will be done
 
+- [ ] SSL/TLS
 - [ ] CI/CD (Jenkins)
 - [ ] Documentation
 - [ ] Frontend on React

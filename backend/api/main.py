@@ -36,7 +36,13 @@ async def lifespan(api: FastAPI):
     api.redis = RedisTools(url=REDIS_CACHE_URL)
 
     api.smtp = SmtpTools(SMTP_HOST, SMTP_PORT, SMTP_EMAIL, SMTP_PASSWORD)
-    yield
+    try:
+        yield
+    finally:
+        api.mongodb_client.close()
+        await api.postgresql.close()
+        await api.redis.close()
+        api.smtp.__del__()
 
 
 app = FastAPI(title="Web_Example_Project", version="0.5.2", lifespan=lifespan)

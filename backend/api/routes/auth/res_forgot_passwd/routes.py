@@ -43,8 +43,8 @@ async def forgot_password(
         )
 
     recovery_code = create_recovery_code()
-    request.app.smtp.send_email(forgot.email, recovery_code)
-    request.app.redis.add_email_code(forgot.email, recovery_code)
+    await request.app.smtp.send_email(forgot.email, recovery_code)
+    await request.app.redis.add_email_code(forgot.email, recovery_code)
 
     response.status_code = status.HTTP_200_OK
     return response
@@ -63,7 +63,7 @@ async def reset_password(
     response: Response,
     reset: ResetPassword,
 ):
-    recovery_code = request.app.redis.get_email_code(reset.email)
+    recovery_code = await request.app.redis.get_email_code(reset.email)
 
     if not recovery_code:
         raise HTTPException(
