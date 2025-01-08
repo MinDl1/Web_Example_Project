@@ -5,7 +5,7 @@ services:
     container_name: backend_api
     build:
       context: .
-      dockerfile: docker/backend/api/Dockerfile
+      dockerfile: backend/api/Dockerfile
     environment:
       - POSTGRES_DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres_database:5432/${POSTGRES_DB}
       - MONGO_DATABASE_URL=mongodb://${MONGO_USER}:${MONGO_PASSWORD}@mongo_database
@@ -39,7 +39,7 @@ services:
     container_name: backend_database_postgres
     build:
       context: .
-      dockerfile: docker/backend/database/postgres/Dockerfile
+      dockerfile: backend/database/postgres/Dockerfile
     environment:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
@@ -58,7 +58,7 @@ services:
     container_name: backend_database_mongo
     build:
       context: .
-      dockerfile: docker/backend/database/mongodb/Dockerfile
+      dockerfile: backend/database/mongodb/Dockerfile
     environment:
       - MONGO_INITDB_ROOT_USERNAME=${MONGO_USER}
       - MONGO_INITDB_ROOT_PASSWORD=${MONGO_PASSWORD}
@@ -78,7 +78,7 @@ services:
     container_name: backend_cache_redis
     build:
       context: .
-      dockerfile: docker/backend/cache/redis/Dockerfile
+      dockerfile: backend/cache/redis/Dockerfile
       args:
         REDIS_PASSWORD: ${REDIS_PASSWORD}
         REDIS_USER: ${REDIS_USER}
@@ -170,7 +170,7 @@ services:
     container_name: test_backend_api
     build:
       context: .
-      dockerfile: docker/backend/test/api/Dockerfile
+      dockerfile: backend/test/api/Dockerfile
     environment:
       - POSTGRES_DATABASE_URL=postgresql://${TEST_POSTGRES_USER}:${TEST_POSTGRES_PASSWORD}@postgres_database:5432/${TEST_POSTGRES_DB}
       - MONGO_DATABASE_URL=mongodb://${TEST_MONGO_USER}:${TEST_MONGO_PASSWORD}@mongo_database
